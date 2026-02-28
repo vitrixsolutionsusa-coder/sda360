@@ -67,5 +67,17 @@ export const completeOnboarding = async (
     return { success: false, error: rpcResult.error ?? "Erro desconhecido." }
   }
 
+  const typedResult = result as { success: boolean; church_id: string; profile_id: string }
+
+  // Salva church_id nos metadados do usuário Auth
+  // Isso permite que os layouts verifiquem o perfil sem depender de RLS
+  await supabase.auth.updateUser({
+    data: {
+      has_profile: true,
+      church_id: typedResult.church_id,
+      profile_id: typedResult.profile_id,
+    },
+  })
+
   return { success: true, data: undefined }
 }

@@ -17,9 +17,7 @@ import {
   Clock,
 } from "lucide-react"
 
-export const metadata: Metadata = {
-  title: "Dashboard",
-}
+export const metadata: Metadata = { title: "Dashboard" }
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -27,13 +25,20 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("church_id, full_name, role")
-    .eq("auth_user_id", user!.id)
-    .single()
+  const firstName = user?.user_metadata?.full_name?.split(" ")[0]
+    ?? user?.email?.split("@")[0]
+    ?? "Bem-vindo"
 
-  const churchId = profile?.church_id
+  const churchId = user?.user_metadata?.church_id as string | undefined
+
+  if (!churchId) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Olá, {firstName}</h2>
+        <p className="text-muted-foreground">Carregando dados da igreja...</p>
+      </div>
+    )
+  }
 
   const [
     { count: membersCount },
@@ -44,21 +49,21 @@ export default async function DashboardPage() {
     supabase
       .from("members")
       .select("*", { count: "exact", head: true })
-      .eq("church_id", churchId ?? ""),
+      .eq("church_id", churchId),
     supabase
       .from("visitors")
       .select("*", { count: "exact", head: true })
-      .eq("church_id", churchId ?? "")
+      .eq("church_id", churchId)
       .eq("status", "new"),
     supabase
       .from("ministries")
       .select("*", { count: "exact", head: true })
-      .eq("church_id", churchId ?? "")
+      .eq("church_id", churchId)
       .eq("is_active", true),
     supabase
       .from("events")
       .select("id, title, start_date, type, status")
-      .eq("church_id", churchId ?? "")
+      .eq("church_id", churchId)
       .in("status", ["approved", "published"])
       .gte("start_date", new Date().toISOString())
       .order("start_date", { ascending: true })
@@ -71,7 +76,8 @@ export default async function DashboardPage() {
       value: membersCount ?? 0,
       description: "Membros cadastrados",
       icon: Users,
-      trend: "+4 este mês",
+      trend: "Ver membros",
+      href: "/dashboard/pessoas/membros",
       color: "text-blue-600",
       bgColor: "bg-blue-50 dark:bg-blue-950",
     },
@@ -80,7 +86,8 @@ export default async function DashboardPage() {
       value: visitorsCount ?? 0,
       description: "Aguardando acompanhamento",
       icon: UserSearch,
-      trend: "3 esta semana",
+      trend: "Ver visitantes",
+      href: "/dashboard/pessoas/visitantes",
       color: "text-emerald-600",
       bgColor: "bg-emerald-50 dark:bg-emerald-950",
     },
@@ -89,16 +96,18 @@ export default async function DashboardPage() {
       value: ministriesCount ?? 0,
       description: "Em atividade regular",
       icon: Building2,
-      trend: "Todos operacionais",
+      trend: "Ver ministérios",
+      href: "/dashboard/ministerios",
       color: "text-violet-600",
       bgColor: "bg-violet-50 dark:bg-violet-950",
     },
     {
       title: "Próximos Eventos",
       value: upcomingEvents?.length ?? 0,
-      description: "Nos próximos 30 dias",
+      description: "Nos próximos dias",
       icon: CalendarDays,
       trend: "Ver agenda",
+      href: "/dashboard/agenda",
       color: "text-amber-600",
       bgColor: "bg-amber-50 dark:bg-amber-950",
     },
@@ -115,43 +124,42 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Saudação */}
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">
-          Bem-vindo, {profile?.full_name?.split(" ")[0]}
+        <h2 className="text-2xl font-bold tracking-tight">
+          Olá, {firstName}
         </h2>
         <p className="text-muted-foreground">
           Aqui está um resumo do que está acontecendo na sua igreja.
         </p>
       </div>
 
-      {/* Cards de estatísticas */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statsCards.map((card) => (
-          <Card key={card.title} className="overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {card.title}
-              </CardTitle>
-              <div className={`rounded-md p-2 ${card.bgColor}`}>
-                <card.icon className={`h-4 w-4 ${card.color}`} />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{card.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {card.description}
-              </p>
-              <div className="mt-2 flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
-                <TrendingUp className="h-3 w-3" />
-                {card.trend}
-              </div>
-            </CardContent>
-          </Card>
+          <a key={card.title} href={card.href}>
+            <Card className="overflow-hidden hover:border-primary/40 transition-colors cursor-pointer">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  {card.title}
+                </CardTitle>
+                <div className={`rounded-md p-2 ${card.bgColor}`}>
+                  <card.icon className={`h-4 w-4 ${card.color}`} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{card.value}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {card.description}
+                </p>
+                <div className="mt-2 flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+                  <TrendingUp className="h-3 w-3" />
+                  {card.trend}
+                </div>
+              </CardContent>
+            </Card>
+          </a>
         ))}
       </div>
 
-      {/* Próximos Eventos */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

@@ -16,13 +16,8 @@ export default async function OnboardingLayout({
     redirect("/login")
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("auth_user_id", user.id)
-    .maybeSingle()
-
-  if (profile) {
+  // Se já tem perfil (via metadata), vai pro dashboard
+  if (user.user_metadata?.has_profile === true) {
     redirect("/dashboard")
   }
 

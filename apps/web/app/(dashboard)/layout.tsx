@@ -17,24 +17,33 @@ export default async function DashboardLayout({
     redirect("/login")
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, role, church_id, churches(name, slug, logo_url, primary_color, secondary_color, system_name)")
-    .eq("auth_user_id", user.id)
-    .maybeSingle()
-
-  if (!profile) {
+  // Verifica onboarding via user metadata (não depende de RLS)
+  const hasProfile = user.user_metadata?.has_profile === true
+  if (!hasProfile) {
     redirect("/onboarding")
   }
 
-  const church = profile.churches as {
+  const churchId = user.user_metadata?.church_id as string | undefined
+
+  // Busca dados da igreja para o white-label (sem RLS block pois é
+  // filtrado pelo church_id que veio do JWT — confiável)
+  let church: {
     name: string
     slug: string
     logo_url: string | null
     primary_color: string
     secondary_color: string
     system_name: string
-  } | null
+  } | null = null
+
+  if (churchId) {
+    const { data } = await supabase
+      .from("churches")
+      .select("name, slug, logo_url, primary_color, secondary_color, system_name")
+      .eq("id", churchId)
+      .maybeSingle()
+    church = data
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
