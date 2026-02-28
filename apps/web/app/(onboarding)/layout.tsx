@@ -20,7 +20,7 @@ export default async function OnboardingLayout({
     .from("profiles")
     .select("id")
     .eq("auth_user_id", user.id)
-    .single()
+    .maybeSingle()
 
   if (profile) {
     redirect("/dashboard")
@@ -28,7 +28,6 @@ export default async function OnboardingLayout({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
-      {/* Top bar */}
       <header className="border-b bg-background/80 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-5xl items-center px-4">
           <div className="flex items-center gap-2 font-bold text-foreground">
@@ -40,8 +39,6 @@ export default async function OnboardingLayout({
           </div>
         </div>
       </header>
-
-      {/* Content */}
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold tracking-tight">

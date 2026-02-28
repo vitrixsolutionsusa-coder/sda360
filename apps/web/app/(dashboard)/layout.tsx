@@ -19,11 +19,15 @@ export default async function DashboardLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("*, churches(name, slug, logo_url, primary_color, secondary_color, system_name)")
+    .select("id, role, church_id, churches(name, slug, logo_url, primary_color, secondary_color, system_name)")
     .eq("auth_user_id", user.id)
-    .single()
+    .maybeSingle()
 
-  const church = profile?.churches as {
+  if (!profile) {
+    redirect("/onboarding")
+  }
+
+  const church = profile.churches as {
     name: string
     slug: string
     logo_url: string | null

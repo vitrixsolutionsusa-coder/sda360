@@ -31,52 +31,24 @@ export const middleware = async (request: NextRequest) => {
 
   const { pathname } = request.nextUrl
 
-  const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register")
-  const isOnboardingRoute = pathname.startsWith("/onboarding")
-  const isPublicRoute = pathname.startsWith("/visita") || pathname === "/"
+  const isAuthRoute =
+    pathname.startsWith("/login") || pathname.startsWith("/register")
 
-  // Não autenticado: redireciona para login (exceto rotas públicas e auth)
+  const isPublicRoute =
+    pathname.startsWith("/visita") || pathname === "/"
+
+  // Não autenticado: redireciona para login
   if (!user && !isAuthRoute && !isPublicRoute) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
     return NextResponse.redirect(url)
   }
 
-  // Autenticado: redireciona de volta se tentar acessar login/register
+  // Autenticado tentando acessar login/register: vai para dashboard
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone()
     url.pathname = "/dashboard"
     return NextResponse.redirect(url)
-  }
-
-  // Autenticado sem perfil: redireciona para onboarding
-  if (user && !isAuthRoute && !isOnboardingRoute && !isPublicRoute) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("auth_user_id", user.id)
-      .single()
-
-    if (!profile) {
-      const url = request.nextUrl.clone()
-      url.pathname = "/onboarding"
-      return NextResponse.redirect(url)
-    }
-  }
-
-  // Autenticado com perfil tentando acessar onboarding: redireciona ao dashboard
-  if (user && isOnboardingRoute) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("auth_user_id", user.id)
-      .single()
-
-    if (profile) {
-      const url = request.nextUrl.clone()
-      url.pathname = "/dashboard"
-      return NextResponse.redirect(url)
-    }
   }
 
   return supabaseResponse
