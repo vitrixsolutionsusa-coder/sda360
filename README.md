@@ -1,135 +1,140 @@
-# Turborepo starter
+# SDA360
 
-This Turborepo starter is maintained by the Turborepo core team.
+> Sistema Operacional Ministerial para igrejas adventistas locais brasileiras nos EUA.
 
-## Using this example
+Plataforma SaaS White-Label multi-tenant para gestão operacional de igrejas adventistas locais.
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
-```
+## Stack Tecnológica
 
-## What's inside?
+| Tecnologia | Uso |
+|---|---|
+| **Next.js 15** (App Router) | Framework principal |
+| **TypeScript** | Tipagem estática |
+| **Supabase** | Auth + PostgreSQL + RLS |
+| **Tailwind CSS v4** | Estilização |
+| **shadcn/ui** + Radix UI | Componentes |
+| **React Query** | State management |
+| **React Hook Form** + Zod | Formulários e validação |
+| **Turborepo** | Monorepo |
+| **pnpm** | Gerenciador de pacotes |
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## Estrutura do Monorepo
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+sda360/
+├── apps/
+│   ├── web/          # Next.js 15 - App principal
+│   └── mobile/       # PWA Mobile (em breve)
+├── packages/
+│   ├── ui/           # Componentes compartilhados
+│   ├── database/     # Tipos do Supabase
+│   ├── types/        # Tipos TypeScript compartilhados
+│   ├── eslint-config/
+│   └── typescript-config/
+├── supabase/
+│   ├── migrations/   # Migrations SQL
+│   └── config.toml
+└── turbo.json
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+---
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+## Módulos do Sistema
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+| Módulo | Fase | Status |
+|---|---|---|
+| Core + Auth + RBAC | Fase 1 | ✅ Base |
+| Pessoas (Membros + Visitantes) | Fase 1 | ✅ Schema |
+| Ministérios | Fase 1 | ✅ Schema |
+| Agenda Central | Fase 1 | ✅ Schema |
+| Programação de Culto | Fase 2 | 🔜 |
+| Recepção (CRM) | Fase 2 | 🔜 |
+| Desbravadores / Aventureiros | Fase 3 | 🔜 |
+| Relatórios + White-Label | Fase 4 | 🔜 |
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+## Como Rodar
 
-```
-cd my-turborepo
+### Pré-requisitos
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+- Node.js >= 18
+- pnpm >= 9
+- Supabase CLI (para desenvolvimento local)
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+### Setup
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+```bash
+# 1. Instalar dependências
+pnpm install
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+# 2. Configurar variáveis de ambiente
+cp apps/web/.env.local.example apps/web/.env.local
+# Edite com suas credenciais Supabase
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+# 3. Rodar o projeto
+pnpm dev
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+### Supabase Local
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+```bash
+# Instalar Supabase CLI
+brew install supabase/tap/supabase
 
+# Iniciar Supabase local
+supabase start
+
+# Aplicar migrations
+supabase db reset
 ```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+---
+
+## Arquitetura Multi-Tenant
+
+Cada igreja é um **tenant isolado** identificado por `church_id`. O isolamento é garantido via:
+
+- **Row Level Security (RLS)** no PostgreSQL
+- Função `get_current_church_id()` derivada do JWT do usuário logado
+- Todas as queries filtram automaticamente pelo tenant do usuário
+
+---
+
+## Roles (RBAC)
+
+| Role | Nível | Acesso |
+|---|---|---|
+| `master` | Super Admin | Acesso total ao sistema |
+| `pastor` | Admin Igreja | Gestão completa |
+| `elder` | Ancião | Aprovações + membros + agenda |
+| `ministry_leader` | Líder | Seu ministério + escalas |
+| `team_member` | Equipe | Tarefas do seu ministério |
+| `parent` | Pai/Responsável | Área dos filhos |
+| `member` | Membro | Agenda pública + perfil |
+| `public` | Visitante | Formulário de visita |
+
+---
+
+## White-Label
+
+Cada igreja pode configurar:
+- Nome do sistema
+- Logo
+- Cores (primária e secundária)
+- Domínio personalizado
+
+As cores são aplicadas via CSS custom properties (`--church-primary`, `--church-secondary`).
+
+---
+
+*Don't forget to commit*
+
+Sugestão de commit:
 ```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+Feat(sda360): initial monorepo setup with Next.js 15, Supabase, multi-tenant RLS schema and base layout
+```

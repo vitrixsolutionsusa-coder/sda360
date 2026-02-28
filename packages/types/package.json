@@ -1,0 +1,12 @@
+{
+  "name": "@sda360/types",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "devDependencies": {
+    "@sda360/typescript-config": "workspace:*",
+    "typescript": "5.9.2"
+  }
+}

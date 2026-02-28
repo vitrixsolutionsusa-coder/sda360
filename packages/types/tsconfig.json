@@ -1,5 +1,5 @@
 {
-  "extends": "@sda360/typescript-config/react-library.json",
+  "extends": "@sda360/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "dist",
     "strictNullChecks": true

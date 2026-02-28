@@ -1,0 +1,15 @@
+{
+  "name": "@sda360/database",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.0"
+  },
+  "devDependencies": {
+    "@sda360/typescript-config": "workspace:*",
+    "typescript": "5.9.2"
+  }
+}
