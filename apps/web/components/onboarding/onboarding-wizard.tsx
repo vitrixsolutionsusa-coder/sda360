@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -53,6 +54,7 @@ const STEP_FIELDS: Record<number, (keyof OnboardingFormData)[]> = {
 }
 
 export function OnboardingWizard() {
+  const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [isPending, startTransition] = useTransition()
 
@@ -115,9 +117,13 @@ export function OnboardingWizard() {
         },
       })
 
-      if (result && !result.success) {
+      if (!result.success) {
         toast.error(result.error)
+        return
       }
+
+      toast.success("Igreja cadastrada com sucesso!")
+      router.push("/dashboard")
     })
   }
 

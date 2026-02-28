@@ -1,6 +1,5 @@
 "use server"
 
-import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import type { ActionResponse } from "@sda360/types"
 
@@ -68,5 +67,5 @@ export const completeOnboarding = async (
     return { success: false, error: rpcResult.error ?? "Erro desconhecido." }
   }
 
-  redirect("/dashboard")
+  return { success: true, data: undefined }
 }
