@@ -123,7 +123,7 @@ export function OnboardingWizard() {
       }
 
       toast.success("Igreja cadastrada com sucesso!")
-      router.push("/dashboard")
+      window.location.href = "/dashboard"
     })
   }
 
